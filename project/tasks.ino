@@ -5,8 +5,6 @@ void vApplicationIdleHook( void ) {
     //TODO going to sleep
       Serial.println("Sleep");
       //TODO
-
-      vTaskDelay( 100 / portTICK_PERIOD_MS);
     
     // Disable external pin interrupt on wake up pin.
     //detachInterrupt(0); 
