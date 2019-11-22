@@ -37,3 +37,15 @@ void TaskBlink(void *pvParameters)  // This is a task.
     vTaskDelay( 1000 / portTICK_PERIOD_MS ); // wait for one second
   }
 }
+
+void vApplicationIdleHook( void ) {
+      // Allow wake up pin to trigger interrupt on low.
+   // attachInterrupt(0, wakeUp, LOW);
+
+    Serial.write("Going to sleep\n");
+    powerDown();
+    Serial.write("Waking up\n");
+
+    // Disable external pin interrupt on wake up pin.
+    //detachInterrupt(0); 
+}
