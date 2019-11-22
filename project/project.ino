@@ -1,8 +1,23 @@
 #include <Arduino_FreeRTOS.h>
+#include <SPI.h>
+#include <LoRa.h>
+#include <EDB.h>
+
+//LoR32u4II 868MHz or 915MHz (black board)
+  #define SCK     15
+  #define MISO    14
+  #define MOSI    16
+  #define SS      8
+  #define RST     4
+  #define DI0     7
+  #define BAND    869100000  // 915E6
+  #define PABOOST true 
 
 void setup() {
   Serial.begin(9600);
   while (!Serial);
+
+  initLoRa();
 
   //TODO set parameters...
 
