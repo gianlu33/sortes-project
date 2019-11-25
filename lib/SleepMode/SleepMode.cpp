@@ -62,7 +62,6 @@ do { 						\
 } while (0);
 
 // Only Pico Power devices can change BOD settings through software
-// TODO Verify if this is true
 #if DISABLE_BOD
 #define	lowPowerBodOff(mode)\
 do { 						\
@@ -77,21 +76,22 @@ do { 						\
 } while (0);
 #endif
 
-// Some macros is still missing from AVR GCC distribution for ATmega32U4
-#if defined __AVR_ATmega32U4__
-	// Timer 4 PRR bit is currently not defined in iom32u4.h
-	#ifndef PRTIM4
-		#define PRTIM4 4
-	#endif
+/*
+Some definitions for our device
+*/
 
-	// Timer 4 power reduction macro is not defined currently in power.h
-	#ifndef power_timer4_disable
-		#define power_timer4_disable()	(PRR1 |= (uint8_t)(1 << PRTIM4))
-	#endif
+// Timer 4 PRR bit is currently not defined in iom32u4.h
+#ifndef PRTIM4
+	#define PRTIM4 4
+#endif
 
-	#ifndef power_timer4_enable
-		#define power_timer4_enable()		(PRR1 &= (uint8_t)~(1 << PRTIM4))
-	#endif
+// Timer 4 power reduction macro is not defined currently in power.h
+#ifndef power_timer4_disable
+	#define power_timer4_disable()	(PRR1 |= (uint8_t)(1 << PRTIM4))
+#endif
+
+#ifndef power_timer4_enable
+	#define power_timer4_enable()		(PRR1 &= (uint8_t)~(1 << PRTIM4))
 #endif
 
 /*******************************************************************************
