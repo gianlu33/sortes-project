@@ -12,18 +12,25 @@
 
 void GatewayComm( void *pvParameters) {
   (void) pvParameters;
+  Log logTemp;
   
   while(1) {
-      Log logTemp;
       logTemp = onReceive(LoRa.parsePacket());
       if (logTemp.msg != 0){
         sleepDuration = logTemp.msg;
         sendData(logTemp.data);
+        // Increase gateway interval counter
+        GWcounter++;
+        // Put logTemp to queue  
+        xQueueSend(logQueue, &logTemp, portMAX_DELAY);
+        Serial.println(logTemp.msg);
+        if(GWcounter >= 20){
+          deepSleepFlag = 1;
+        }
+        vTaskDelay( (logTemp.msg*1000-safeWakeTime*2) / portTICK_PERIOD_MS);
       }
-
-      // Put longtemp to queue
-      
       // sleep for duration
+
       
       
       //TODO
@@ -36,6 +43,7 @@ void SerialCommPC( void *pvParameters) {
   (void) pvParameters;  
     while(1) {
       SerialInstructionHandlerPC();
+      vTaskDelay( 20 / portTICK_PERIOD_MS);
   }
 }
 
@@ -45,13 +53,18 @@ void DatabaseHandler( void *pvParameters) {
     while(1) {
       //Serial.println("Hello DatabaseHandler");
       
-      if(xSemaphoreTake(SemaphoreHndl, (TickType_t) 5) == pdTRUE){
-        // Access queue and save the data
-        addRecord(logType);
-        xSemaphoreGive(SemaphoreHndl);
+      
+      Log logTemp;
+      if(xQueueReceive(logQueue, &logTemp, portMAX_DELAY) == pdPASS){
+        if(xSemaphoreTake(SemaphoreHndl, (TickType_t) 5) == pdTRUE){
+          addRecord(logTemp);
+        }
       }
+      xSemaphoreGive(SemaphoreHndl);
+      goToSleepFlag = 1;
+      
       //TODO
-      vTaskDelay( 250 / portTICK_PERIOD_MS);
+      vTaskDelay( 20 / portTICK_PERIOD_MS);
 
   }
 }

@@ -15,19 +15,10 @@ struct Log onReceive(int packetSize) {
   for (int i = 0; i<4; i++){
     header += (char)LoRa.read();
   }
-  
-  /*
-  // If the msg is encoded as characters
-  String incoming = "";
-  while (LoRa.available()) {
-    incoming += (char)LoRa.read();
-  }
-  int timeData = incoming.toInt();
-  */
 
-  // If the msg is sent as a single byte (or maybe int?)
+  // Read the content byte of the message
   byte tD = LoRa.read();
-  int timeData = tD-48;   // ASCII conversion to an integer
+  int timeData = tD-48;   // ASCII conversion to integer
   //Serial.println(timeData);
   float temperatureData = getTemp();
 
@@ -37,8 +28,8 @@ struct Log onReceive(int packetSize) {
   return logTemp;
 }
 
-void sendData(float d){
+void sendData(float data){
   LoRa.beginPacket();
-  LoRa.write(d);
+  LoRa.write(data);
   LoRa.endPacket();
 }

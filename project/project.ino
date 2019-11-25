@@ -22,7 +22,12 @@
 
 const int teamNum = 06;
 
-const int safeWakeTime = 250;
+int GWcounter = 0;
+
+const int safeWakeTime = 300;
+
+int goToSleepFlag = 0;
+int deepSleepFlag = 0;
 
 int sleepDuration = 0;
 
@@ -47,8 +52,8 @@ void setup() {
 
   setup_sleep();
   
-  //db.create(0, TABLE_SIZE, (unsigned int)sizeof(logType));
-  db.open(0);       // Uncomment for using an already stored EEPROM database, comment out db.create() in this case!
+  db.create(0, TABLE_SIZE, (unsigned int)sizeof(logType));
+  //db.open(0);       // Uncomment for using an already stored EEPROM database, comment out db.create() in this case!
 
   //TODO set parameters...
 
@@ -58,32 +63,34 @@ void setup() {
   
   logQueue = xQueueCreate(10, sizeof(Log));
 
-  // Now set up two tasks to run independently.
-  xTaskCreate(
-    GatewayComm
-    ,  (const portCHAR *)"GatewayComm"   // A name just for humans
-    ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL );
-
-    // Now set up two tasks to run independently.
+  // Setting up tasks
+  if(logQueue != NULL){
+    xTaskCreate(
+      GatewayComm
+      ,  (const portCHAR *)"GatewayComm"   // A name just for humans
+      ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
+      ,  NULL
+      ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+      ,  NULL );
+  
+    xTaskCreate(
+      DatabaseHandler
+      ,  (const portCHAR *)"DatabaseHandler"   // A name just for humans
+      ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
+      ,  NULL
+      ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+      ,  NULL );
+  }
   xTaskCreate(
     SerialCommPC
     ,  (const portCHAR *)"SerialCommPC"   // A name just for humans
     ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
     ,  NULL
-    ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+    ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
     ,  NULL );
 
-    // Now set up two tasks to run independently.
-  xTaskCreate(
-    DatabaseHandler
-    ,  (const portCHAR *)"DatabaseHandler"   // A name just for humans
-    ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL );
+
+ 
 }
 
 void loop() {
