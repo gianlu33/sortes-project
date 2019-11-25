@@ -21,7 +21,9 @@ void SerialInstructionHandlerPC(){
             break;
             case 3:
               // Enter ultra low power mode
-              enterPowerDownMode();
+              //enterPowerDownMode();
+              enterIdleMode(3);
+              
             break;
             default:
             break;  
