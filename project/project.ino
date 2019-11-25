@@ -4,6 +4,8 @@
 #include <EDB.h>
 #include <EEPROM.h>
 #include <stdlib.h>
+#include <semphr.h>
+#include <queue.h>
 
 #define TABLE_SIZE 512
 
@@ -19,7 +21,11 @@
 
 const int teamNum = 06;
 
+const int safeWakeTime = 250;
+
 int sleepDuration = 0;
+
+SemaphoreHandle_t SemaphoreHndl;
 
 EDB db(&writer, &reader);
 EDB_Status dbst = EDB_OK;
@@ -28,7 +34,9 @@ struct Log {
   // Struct for storing data inside database. System is prepared to store more parameters.
   int msg;
   float data;
-}logTemp;
+}logType;
+
+QueueHandle_t logQueue;
 
 void setup() {
   Serial.begin(9600);
@@ -36,10 +44,16 @@ void setup() {
 
   initLoRa();
   
-  db.create(0, TABLE_SIZE, (unsigned int)sizeof(logTemp));
-  //db.open(0);       // Uncomment for using an already stored EEPROM database, comment out db.create() in this case!
+  //db.create(0, TABLE_SIZE, (unsigned int)sizeof(logType));
+  db.open(0);       // Uncomment for using an already stored EEPROM database, comment out db.create() in this case!
 
   //TODO set parameters...
+
+  SemaphoreHndl = xSemaphoreCreateBinary();
+  if( (SemaphoreHndl) != NULL)
+    xSemaphoreGive((SemaphoreHndl));
+  
+  logQueue = xQueueCreate(10, sizeof(Log));
 
   // Now set up two tasks to run independently.
   xTaskCreate(

@@ -27,11 +27,13 @@ byte reader(unsigned long address)
   return EEPROM.read(address);
 }
 
-EDB_Status addRecord(int msg, float data)
+EDB_Status addRecord(struct Log logTempLoc)
 {
+  /*
   Log logTempLoc;
   logTempLoc.msg = msg;
   logTempLoc.data = data;
+  */
   EDB_Status st = db.appendRec(EDB_REC logTempLoc);
   return st;
 }

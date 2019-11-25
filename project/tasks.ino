@@ -12,12 +12,21 @@
 
 void GatewayComm( void *pvParameters) {
   (void) pvParameters;
-
+  
   while(1) {
+      Log logTemp;
       logTemp = onReceive(LoRa.parsePacket());
-      sleepDuration = logTemp.msg;
-      // sleep for duration
+      if (logTemp.msg != 0){
+        sleepDuration = logTemp.msg;
+        Serial.println(logTemp.data);
+        Serial.println((int)logTemp.data);
+        sendData(logTemp.data);
+      }
 
+      // Put longtemp to queue
+      
+      // sleep for duration
+      
       
       //TODO
       //Serial.println(tempMsg);
@@ -26,8 +35,7 @@ void GatewayComm( void *pvParameters) {
 }
 
 void SerialCommPC( void *pvParameters) {
-  (void) pvParameters;
-    
+  (void) pvParameters;  
     while(1) {
       SerialInstructionHandlerPC();
   }
@@ -38,6 +46,12 @@ void DatabaseHandler( void *pvParameters) {
 
     while(1) {
       //Serial.println("Hello DatabaseHandler");
+      
+      if(xSemaphoreTake(SemaphoreHndl, (TickType_t) 5) == pdTRUE){
+        // Access queue and save the data
+        addRecord(logType);
+        xSemaphoreGive(SemaphoreHndl);
+      }
       //TODO
       vTaskDelay( 250 / portTICK_PERIOD_MS);
 

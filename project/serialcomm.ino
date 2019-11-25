@@ -2,7 +2,7 @@ void SerialInstructionHandlerPC(){
   int inputMsg = 0;
       while(Serial.available() > 0){
         inputMsg = Serial.parseInt();
-          switch (inputMsg)
+          switch (inputMsg){
             case 1:
             readRecord(db.count());
             break;
@@ -11,9 +11,10 @@ void SerialInstructionHandlerPC(){
             break;
             case 3:
             //lowPower
-            Serial.println("Entering low power mode")
+            Serial.println("Entering low power mode");
             break;
             default:
             break;  
+          }
       }
 }

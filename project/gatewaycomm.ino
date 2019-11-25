@@ -1,7 +1,10 @@
 //TODO functions
 
-Log onReceive(int packetSize) {
-  if (packetSize == 0) return "error";  // if there's no packet, return
+struct Log onReceive(int packetSize) {
+  Log logTemp;
+  logTemp.msg = 0;
+  logTemp.data = 0;
+  if (packetSize == 0) return logTemp;  // if there's no packet, return
   
   String header = "";
 
@@ -23,13 +26,19 @@ Log onReceive(int packetSize) {
   */
 
   // If the msg is sent as a single byte (or maybe int?)
-  byte timeData = LoRa.read();
+  byte tD = LoRa.read();
+  int timeData = tD-48;   // ASCII conversion to an integer
+  Serial.println(timeData);
   float temperatureData = getTemp();
-
-  Log logTemp;
 
   logTemp.msg = timeData;
   logTemp.data = temperatureData;
 
   return logTemp;
+}
+
+void sendData(float d){
+  LoRa.beginPacket();
+  LoRa.write(d);
+  LoRa.endPacket();
 }
