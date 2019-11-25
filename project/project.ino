@@ -2,6 +2,10 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include <EDB.h>
+#include <EEPROM.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 512
 
 //LoR32u4II 868MHz or 915MHz (black board)
   #define SCK     15
@@ -13,11 +17,26 @@
   #define BAND    869100000  // 915E6
   #define PABOOST true 
 
+const int teamNum = 06;
+
+int sleepDuration = 0;
+
+EDB db(&writer, &reader);
+EDB_Status dbst = EDB_OK;
+
+struct Log {
+  // Struct for storing data inside database. System is prepared to store more parameters.
+  int msg;
+  float data;
+}logType;
+
 void setup() {
   Serial.begin(9600);
   while (!Serial);
 
   initLoRa();
+  
+  db.create(0, TABLE_SIZE, (unsigned int)sizeof(logType));
 
   //TODO set parameters...
 

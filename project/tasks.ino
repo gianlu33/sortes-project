@@ -14,7 +14,11 @@ void GatewayComm( void *pvParameters) {
   (void) pvParameters;
 
   while(1) {
-      String tempMsg = onReceive(LoRa.parsePacket());
+      Log logTemp = onReceive(LoRa.parsePacket());
+      sleepDuration = logTemp.msg;
+      // sleep for duration
+
+      
       //TODO
       //Serial.println(tempMsg);
       //vTaskDelay( 100 / portTICK_PERIOD_MS);
@@ -23,11 +27,24 @@ void GatewayComm( void *pvParameters) {
 
 void SerialCommPC( void *pvParameters) {
   (void) pvParameters;
-
+    int inputMsg = 0;
     while(1) {
-      //Serial.println("Hello SerialCommPC");
-      //TODO
-      vTaskDelay( 500 / portTICK_PERIOD_MS);
+      while(Serial.available() > 0){
+        inputMsg = Serial.parseInt();
+          switch (inputMsg)
+            case 1:
+            readRecord(db.count()-1);
+            break;
+            case 2:
+            readAllRec();
+            break;
+            case 3:
+            //lowPower
+            Serial.println("Entering low power mode")
+            break;
+            default:
+            break;  
+      }
   }
 }
 

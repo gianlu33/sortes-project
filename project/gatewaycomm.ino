@@ -1,30 +1,35 @@
 //TODO functions
 
-String onReceive(int packetSize) {
+Log onReceive(int packetSize) {
   if (packetSize == 0) return "error";  // if there's no packet, return
+  
   String header = "";
-  Serial.println("in");
-  // read packet header bytes:
-  //char a = LoRa.read();
-  //char b = LoRa.read();
-  //char c = LoRa.read();
-  //char d = LoRa.read();
-  //for (int i = 0; i<4; i++){
-    //header += (char)LoRa.read();
-  //}
 
+  // Packet might not be sent with individual writes! We need to determine the format of the message:
+  // Can we read it in bytes, or only the whole packet at once with a single read?
+  
+  // read packet header bytes:
+  for (int i = 0; i<4; i++){
+    header += (char)LoRa.read();
+  }
+  
+  /*
+  // If the msg is encoded as characters
   String incoming = "";
   while (LoRa.available()) {
     incoming += (char)LoRa.read();
   }
-  String timeToNextMsg = incoming;
+  int timeData = incoming.toInt();
+  */
 
-  //Serial.print(a);
-  //Serial.print(b);
-  //Serial.print(c);
-  //Serial.print(d);
-  //Serial.print(" ");
-  Serial.println(timeToNextMsg);
+  // If the msg is sent as a single byte (or maybe int?)
+  byte timeData = LoRa.read();
+  float temperatureData = getTemp();
 
-  return incoming;
+  Log logTemp;
+
+  logTemp.msg = timeData;
+  logTemp.data = temperatureData;
+
+  return logTemp;
 }
