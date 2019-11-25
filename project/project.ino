@@ -28,7 +28,7 @@ struct Log {
   // Struct for storing data inside database. System is prepared to store more parameters.
   int msg;
   float data;
-}logType;
+}logTemp;
 
 void setup() {
   Serial.begin(9600);
@@ -36,7 +36,8 @@ void setup() {
 
   initLoRa();
   
-  db.create(0, TABLE_SIZE, (unsigned int)sizeof(logType));
+  db.create(0, TABLE_SIZE, (unsigned int)sizeof(logTemp));
+  //db.open(0);       // Uncomment for using an already stored EEPROM database, comment out db.create() in this case!
 
   //TODO set parameters...
 
@@ -68,4 +69,6 @@ void setup() {
     ,  NULL );
 }
 
-void loop() {}
+void loop() {
+  // Empty. See tasks.ino for running functions  
+}

@@ -44,20 +44,21 @@ EDB_Status deleteRecord(int id)
 
 EDB_Status readRecord(int id)
 {
-  EDB_Status st = db.readRec(id, EDB_REC logTemp);
+  Log logTempLoc;
+  EDB_Status st = db.readRec(id, EDB_REC logTempLoc);
   if (st == EDB_OK)
   {
     Serial.print("Message: ");
-    Serial.print(logTemp.msg);
+    Serial.print(logTempLoc.msg);
     Serial.print(" Temperature: ");
-    Serial.println(logTemp.data);
+    Serial.println(logTempLoc.data);
   }
   return st;
 }
 
 EDB_Status readAllRec(){
   EDB_Status st = EDB_OK;
-  for(int i = 0; i < db.count(); i++){
+  for(int i = 1; i <= db.count(); i++){
     Serial.print("Data ");
     Serial.print(i+1);
     Serial.print(".: ");
@@ -66,6 +67,10 @@ EDB_Status readAllRec(){
       return st;
   }
   return st;
+}
+
+void deleteAllRecords(){
+  db.clear();
 }
 
 float getTemp()

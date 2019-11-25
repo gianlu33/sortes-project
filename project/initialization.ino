@@ -6,5 +6,3 @@ void initLoRa(){
   }
   Serial.println("LoRa init succeeded.");
 }
-
-// Function for filling up db upon turning on system...
