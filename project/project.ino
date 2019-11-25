@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <semphr.h>
 #include <queue.h>
+#include <SleepMode.h>
 
-#define TABLE_SIZE 512
+#define TABLE_SIZE 512          // Up to 1024
 
 //LoR32u4II 868MHz or 915MHz (black board)
   #define SCK     15
@@ -43,6 +44,8 @@ void setup() {
   while (!Serial);
 
   initLoRa();
+
+  setup_sleep();
   
   //db.create(0, TABLE_SIZE, (unsigned int)sizeof(logType));
   db.open(0);       // Uncomment for using an already stored EEPROM database, comment out db.create() in this case!
@@ -70,7 +73,7 @@ void setup() {
     ,  (const portCHAR *)"SerialCommPC"   // A name just for humans
     ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
     ,  NULL
-    ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+    ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
     ,  NULL );
 
     // Now set up two tasks to run independently.

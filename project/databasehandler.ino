@@ -62,7 +62,7 @@ EDB_Status readAllRec(){
   EDB_Status st = EDB_OK;
   for(int i = 1; i <= db.count(); i++){
     Serial.print("Data ");
-    Serial.print(i+1);
+    Serial.print(i);
     Serial.print(".: ");
     st = readRecord(i);
     if(st != EDB_OK)

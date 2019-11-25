@@ -18,8 +18,6 @@ void GatewayComm( void *pvParameters) {
       logTemp = onReceive(LoRa.parsePacket());
       if (logTemp.msg != 0){
         sleepDuration = logTemp.msg;
-        Serial.println(logTemp.data);
-        Serial.println((int)logTemp.data);
         sendData(logTemp.data);
       }
 

@@ -28,7 +28,7 @@ struct Log onReceive(int packetSize) {
   // If the msg is sent as a single byte (or maybe int?)
   byte tD = LoRa.read();
   int timeData = tD-48;   // ASCII conversion to an integer
-  Serial.println(timeData);
+  //Serial.println(timeData);
   float temperatureData = getTemp();
 
   logTemp.msg = timeData;
