@@ -2,19 +2,17 @@
 #define SYS_CLK 16e6
 #define CNT_CLK SYS_CLK / 1024
 
-bool isIdle = false;
+bool is_idle = false; // to check if we have to go to sleep again if the interrupt is triggered
+bool idle_finished = true; // to ensure that enterIdleMode() (the one without parameters) does not go to sleep if we have already finished
 unsigned int cnt_left = 0;
 
-//TODO wake up device if i send a command on the serial interface
+//TODO wake up device if i send a command on the serial interface (maybe it is already working..)
 
 void setup_sleep() {
   pinMode(WAKE_PIN, INPUT_PULLUP);
 }
 
-void wakeUp() {
-  //TODO verify if there is something to do
-  Serial.println("Interrupt triggered");
-}
+/* IDLE MODE */
 
 // TCCR3A
 // 7       6       5      4      3     2      1     0
@@ -25,7 +23,7 @@ void wakeUp() {
 
 void enterIdleMode(int seconds) {
   //set the counter
-  cnt_left = CNT_CLK * seconds - safeWakeTime;
+  cnt_left = CNT_CLK * seconds - (CNT_CLK * safeWakeTime) / 1000;
   
   setCounter();
 
@@ -39,16 +37,17 @@ void enterIdleMode(int seconds) {
   //enable interrupt
   bitSet(TIMSK3, 1);
 
-  isIdle = true;
+  is_idle = true;
+  idle_finished = false;
   idleMode();
 }
 
-// Call this one if we were already sleeping, but it arrives a serial communication and you serve it, then you want to go to sleep again
+// Call this one if you were already sleeping, but it arrives a serial communication and you serve it, then you want to go to sleep again
 // Note that the timer is already set, we don't have to do anything except for going to sleep
 // If in the meanwhile the counter has reached 0, we don't have to sleep
 void enterIdleMode() {
-  if(cnt_left != 0) {
-    isIdle = true;
+  if(!idle_finished) {
+    is_idle = true;
     idleMode();
   }
 }
@@ -71,14 +70,15 @@ ISR (TIMER3_COMPA_vect)
 
     // what happens if this routine is triggered when i'm reading from serial port? I can't go to sleep while i'm doing something else
     // When this occurs, idle must be set to false manually, do all the operations and then call enterIdleMode()
-    if(isIdle) {
+    if(is_idle) {
       idleMode();
     }
   }
   else {
     // disable interrupt
       bitClear(TIMSK3, 1);
-      isIdle = false;
+      is_idle = false;
+      idle_finished = true;
   }
 }
 
@@ -87,6 +87,8 @@ void idleMode() {
   SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
                      SPI_OFF, USART1_ON, TWI_OFF, USB_OFF);
 }
+
+/* POWER DOWN MODE */
 
 void enterPowerDownMode() {
     Serial.println("enteredF");
@@ -98,4 +100,9 @@ void enterPowerDownMode() {
     Serial.println("External interrupt received, waking up from low power mode");
     
     detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
+}
+
+void wakeUp() {
+  //TODO verify if there is something to do
+  Serial.println("Interrupt triggered");
 }
