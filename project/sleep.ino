@@ -25,14 +25,19 @@ void enterIdleMode(int seconds) {
   //set the counter
   cnt_left = CNT_CLK * seconds - (CNT_CLK * safeWakeTime) / 1000;
   
-  setCounter();
-
   //set clock source clk / 1024 -> write 101 in CS32..CS30
   //set mode 7 (up to OCR3A)
   //TODO change only the bits i'm interested in
   //TODO this can be moved in the "setup" phase
   TCCR3A = 0;
   TCCR3B = 0b00001101;
+
+  //TODO check the order of these instructions
+  // clear the counter
+  TCNT3 = 0; 
+
+  // set the compare register
+  setCounter(); 
   
   //enable interrupt
   bitSet(TIMSK3, 1);
