@@ -37,9 +37,10 @@ void enterIdleMode(int seconds) {
 
   is_idle = true;
   idle_finished = false;
-
+  
   Serial.println("Entering idle mode");
   delay(20);
+  
   idleMode();
 }
 
@@ -67,7 +68,7 @@ void setCounter() {
 }
 
 ISR (TIMER3_COMPA_vect)
-{
+{ 
   if(cnt_left != 0) {     // maybe >= 0?
     Serial.println("Temp wake");
     delay(20);
@@ -82,6 +83,7 @@ ISR (TIMER3_COMPA_vect)
   else {
     // disable interrupt
       bitClear(TIMSK3, 1);
+      resumeTasks();
       is_idle = false;
       idle_finished = true;
       Serial.println("Sleep finished");
@@ -89,15 +91,21 @@ ISR (TIMER3_COMPA_vect)
 }
 
 void idleMode() {
-  //TODO verify if it's all correct
+   // stopping tasks
+  stopTasks();
+
+  //portSUPPRESS_TICKS_AND_SLEEP(cnt_left * 1024);
   SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
                      SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+ 
+                    
+  Serial.println("wake up");
 }
 
 // POWER DOWN MODE
 
 void enterPowerDownMode() {
-    attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, CHANGE); // select between CHANGE, LOW, RISING, FALLING
+    attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, LOW); // select between CHANGE, LOW, RISING, FALLING
     Serial.println("Entering power down mode");
     delay(20);
     SleepMode.powerDown(ADC_OFF, BOD_OFF);

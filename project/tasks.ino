@@ -1,11 +1,12 @@
+/*
 void SleepTask(void *pvParameters) {
   (void) pvParameters;
     
   while(1) {
       if(powerDownFlag) {
-        //Serial.println("Power down mode");
+        Serial.println("Power down mode");
         // go to power down mode
-        //enterPowerDownMode();
+        enterPowerDownMode();
         powerDownFlag = false;
       }
       if(idleFlag) {
@@ -17,6 +18,20 @@ void SleepTask(void *pvParameters) {
 
       vTaskDelay( 20 / portTICK_PERIOD_MS);
   }
+}
+*/
+
+void vApplicationIdleHook(void) {
+      if(powerDownFlag) {
+        // go to power down mode
+        enterPowerDownMode();
+        powerDownFlag = false;
+      }
+      if(idleFlag) {
+        // go to idle mode
+        enterIdleMode(sleepDuration);
+        idleFlag = false;
+      }
 }
 
 void GatewayComm( void *pvParameters) {
@@ -72,4 +87,16 @@ void DatabaseHandler( void *pvParameters) {
       //TODO
       vTaskDelay( 20 / portTICK_PERIOD_MS);
   }
+}
+
+void stopTasks() {
+  vTaskSuspend(gatewayHandle);
+  vTaskSuspend(serialHandle);
+  vTaskSuspend(databaseHandle);
+}
+
+void resumeTasks() {
+  vTaskResume(gatewayHandle);
+  vTaskResume(serialHandle);
+  vTaskResume(databaseHandle);
 }

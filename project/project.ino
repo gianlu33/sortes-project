@@ -31,6 +31,8 @@ bool powerDownFlag = false;
 
 int sleepDuration = 0;
 
+TaskHandle_t gatewayHandle, databaseHandle, sleepHandle, serialHandle;
+
 SemaphoreHandle_t SemaphoreHndl;
 
 EDB db(&writer, &reader);
@@ -72,7 +74,7 @@ void setup() {
       ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
       ,  NULL
       ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-      ,  NULL );
+      ,  &gatewayHandle );
       
     xTaskCreate(
       DatabaseHandler
@@ -80,7 +82,7 @@ void setup() {
       ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
       ,  NULL
       ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-      ,  NULL );
+      ,  &databaseHandle );
   }
   xTaskCreate(
     SerialCommPC
@@ -88,15 +90,15 @@ void setup() {
     ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
     ,  NULL
     ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL );
+    ,  &serialHandle );
 
-    xTaskCreate(
+  /*  xTaskCreate(
       SleepTask
       ,  (const portCHAR *)"SleepTask"   // A name just for humans
       ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
       ,  NULL
       ,  0  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-      ,  NULL );
+      ,  &sleepHandle );*/
 
 
  
