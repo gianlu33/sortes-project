@@ -12,7 +12,7 @@ void setup_sleep() {
   pinMode(WAKE_PIN, INPUT_PULLUP);
 }
 
-/* IDLE MODE */
+// IDLE MODE
 
 // TCCR3A
 // 7       6       5      4      3     2      1     0
@@ -23,7 +23,7 @@ void setup_sleep() {
 
 void enterIdleMode(int seconds) {
   //set the counter
-  cnt_left = CNT_CLK * seconds - (CNT_CLK * safeWakeTime) / 1000;
+  cnt_left = CNT_CLK * seconds - (CNT_CLK * safeWakeTime) / 1000;   // I think this might be wrong, as the clock is continuously running
   
   //set clock source clk / 1024 -> write 101 in CS32..CS30
   //set mode 7 (up to OCR3A)
@@ -44,6 +44,7 @@ void enterIdleMode(int seconds) {
 
   is_idle = true;
   idle_finished = false;
+  Serial.println("in");
   idleMode();
 }
 
@@ -70,7 +71,7 @@ void setCounter() {
 
 ISR (TIMER3_COMPA_vect)
 {
-  if(cnt_left != 0) {
+  if(cnt_left != 0) {     // maybe >= 0?
     setCounter();
 
     // what happens if this routine is triggered when i'm reading from serial port? I can't go to sleep while i'm doing something else
@@ -90,10 +91,10 @@ ISR (TIMER3_COMPA_vect)
 void idleMode() {
   //TODO verify if it's all correct
   SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_ON, TWI_OFF, USB_OFF);
+                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
 }
 
-/* POWER DOWN MODE */
+// POWER DOWN MODE
 
 void enterPowerDownMode() {
     Serial.println("enteredF");
