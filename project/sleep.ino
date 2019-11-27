@@ -83,6 +83,7 @@ ISR (TIMER3_COMPA_vect)
   else {
     // disable interrupt
       bitClear(TIMSK3, 1);
+      disableIdleMode();
       resumeTasks();
       is_idle = false;
       idle_finished = true;
@@ -95,11 +96,22 @@ void idleMode() {
   stopTasks();
 
   //portSUPPRESS_TICKS_AND_SLEEP(cnt_left * 1024);
-  SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
- 
+  //SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
+    //                 SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+  enableIdleMode();
                     
-  Serial.println("wake up");
+  //Serial.println("wake up");
+}
+
+// FAKE IDLE MODE
+void enableIdleMode() {
+    SleepMode.disableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
+                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+}
+
+void disableIdleMode() {
+    SleepMode.enableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
+                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
 }
 
 // POWER DOWN MODE

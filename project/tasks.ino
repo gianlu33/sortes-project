@@ -50,6 +50,7 @@ void GatewayComm( void *pvParameters) {
         xQueueSend(logQueue, &logTemp, portMAX_DELAY);
         Serial.println(logTemp.msg);
         if(GWcounter >= counterLimit){
+          Serial.println("aaaa");
           powerDownFlag = true;
         }
         vTaskDelay( (logTemp.msg*1000-safeWakeTime*2) / portTICK_PERIOD_MS);
@@ -79,6 +80,7 @@ void DatabaseHandler( void *pvParameters) {
         }
         
         xSemaphoreGive(SemaphoreHndl);
+        //Serial.println("bbb");
         idleFlag = true;
       }
       
