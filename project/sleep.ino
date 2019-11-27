@@ -108,6 +108,7 @@ void enterPowerDownMode() {
     attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, LOW); // select between CHANGE, LOW, RISING, FALLING
     Serial.println("Entering power down mode");
     delay(20);
+    stopTasks();
     SleepMode.powerDown(ADC_OFF, BOD_OFF);
     Serial.println("Wake up from power down mode");
     detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
@@ -116,4 +117,5 @@ void enterPowerDownMode() {
 void wakeUp() {
   //TODO verify if there is something to do
   Serial.println("Interrupt triggered");
+  resumeTasks();
 }

@@ -60,3 +60,7 @@ void idleMode() {
   SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
                      SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
 }
+
+void powerDownMode() {
+  SleepMode.powerDown(ADC_OFF, BOD_OFF);
+}

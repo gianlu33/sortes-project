@@ -22,6 +22,8 @@
 
 const int teamNum = 06;
 
+const int counterLimit = 20;
+
 int GWcounter = 0;
 
 const int safeWakeTime = 300;

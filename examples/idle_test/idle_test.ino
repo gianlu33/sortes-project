@@ -3,6 +3,7 @@
 
 int sleepTime = 0;
 int val;
+int cnt =0;
 
 void setup() {
   Serial.begin(9600);
@@ -30,9 +31,17 @@ void loop() {
   if(val != -1) {
     Serial.println(val);
     delay(20);
+    sendData(val);
       digitalWrite(LED_BUILTIN, LOW);
-      setTimer(20);
+      setTimer(val - 1);
       idleMode();
       digitalWrite(LED_BUILTIN, HIGH);
+      
+    if (cnt > 5) {
+      Serial.println("Power down");
+      delay(20);
+      powerDownMode();
+    }
+      cnt++;
   }
 }

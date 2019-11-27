@@ -26,8 +26,9 @@ void vApplicationIdleHook(void) {
         // go to power down mode
         enterPowerDownMode();
         powerDownFlag = false;
+        idleFlag = false;
       }
-      if(idleFlag) {
+      else if(idleFlag) {
         // go to idle mode
         enterIdleMode(sleepDuration);
         idleFlag = false;
@@ -48,7 +49,7 @@ void GatewayComm( void *pvParameters) {
         // Put logTemp to queue  
         xQueueSend(logQueue, &logTemp, portMAX_DELAY);
         Serial.println(logTemp.msg);
-        if(GWcounter >= 20){
+        if(GWcounter >= counterLimit){
           powerDownFlag = true;
         }
         vTaskDelay( (logTemp.msg*1000-safeWakeTime*2) / portTICK_PERIOD_MS);
