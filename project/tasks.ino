@@ -80,12 +80,14 @@ void DatabaseHandler( void *pvParameters) {
         }
         
         xSemaphoreGive(SemaphoreHndl);
-        //Serial.println("bbb");
-        idleFlag = true;
+        Serial.println("bbb");
+        if(GWcounter < 20){
+            idleFlag = true;
+        }
+        else{
+            idleFlag = false;
+        }
       }
-      
-      
-     
       
       //TODO
       vTaskDelay( 20 / portTICK_PERIOD_MS);
