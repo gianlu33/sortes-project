@@ -1,10 +1,13 @@
-/*#define SYS_CLK 16e6
+#define SYS_CLK 8e6
 #define CNT_CLK SYS_CLK / 1024
 
-unsigned int cnt_left = 0;
+unsigned long cnt_left = 0;
+bool flagfirst = false;
 
 void setTimer(int seconds){
-    cnt_left = CNT_CLK * seconds;   // I think this might be wrong, as the clock is continuously running
+  cnt_left = CNT_CLK * seconds;
+  //Serial.print("Setting timer with: ");
+  //Serial.println(cnt_left);
   
   //set clock source clk / 1024 -> write 101 in CS32..CS30
   //set mode 7 (up to OCR3A)
@@ -13,13 +16,15 @@ void setTimer(int seconds){
   TCCR3A = 0;
   TCCR3B = 0b00001101;
 
-  
   //TODO check the order of these instructions
   // clear the counter
   TCNT3 = 0; 
 
   // set the compare register
   setCounter(); 
+
+  // clear pending ints
+  bitSet(TIFR3,OCF3A);
   
   //enable interrupt
   bitSet(TIMSK3, 1);
@@ -38,20 +43,26 @@ void setCounter() {
 
 ISR (TIMER3_COMPA_vect)
 {
+  if(flagfirst){
+    flagfirst = false;
+    return;
+  }
+  
+  //Serial.println("Int");
   if(cnt_left != 0) {     // maybe >= 0?
     setCounter();
 
     // what happens if this routine is triggered when i'm reading from serial port? I can't go to sleep while i'm doing something else
     // When this occurs, idle must be set to false manually, do all the operations and then call enterIdleMode()
-    if(is_idle) {
-      idleMode();
-    }
+    idleMode();
   }
   else {
     // disable interrupt
       bitClear(TIMSK3, 1);
-      is_idle = false;
-      idle_finished = true;
   }
 }
-*/
+
+void idleMode() {
+  SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
+                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+}

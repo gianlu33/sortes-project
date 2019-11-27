@@ -1,0 +1,5 @@
+Normal: 13.5 mA
+
+Idle: 9.5 mA
+
+PowerDown: 2.8 mA

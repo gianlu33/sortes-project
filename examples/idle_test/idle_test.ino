@@ -1,8 +1,11 @@
 #include <SleepMode.h>
+#include <LoRa.h>
 
 void setup() {
   Serial.begin(9600);
   while (!Serial);
+
+  initLoRa();
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -10,11 +13,11 @@ void setup() {
 
 void loop() {
   while(Serial.available() > 0){
-
+      Serial.parseInt();
+      
       digitalWrite(LED_BUILTIN, LOW);
-      SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-
+      setTimer(20);
+      idleMode();
       digitalWrite(LED_BUILTIN, HIGH);
 
   }
