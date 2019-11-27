@@ -22,7 +22,7 @@
 
 const int teamNum = 06;
 
-const int counterLimit = 5;
+const int counterLimit = 20;
 
 int GWcounter = 0;
 

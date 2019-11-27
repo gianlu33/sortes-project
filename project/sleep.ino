@@ -106,12 +106,14 @@ void idleMode() {
 // FAKE IDLE MODE
 void enableIdleMode() {
     SleepMode.disableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_ON);
+                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+                     // USB_ON to turn on Serial during GW operation!
 }
 
 void disableIdleMode() {
     SleepMode.enableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_ON);
+                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+                     // USB_ON to turn on Serial during GW operation!
 }
 
 // POWER DOWN MODE

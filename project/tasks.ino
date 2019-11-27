@@ -49,9 +49,6 @@ void GatewayComm( void *pvParameters) {
         // Put logTemp to queue  
         xQueueSend(logQueue, &logTemp, portMAX_DELAY);
         Serial.println(logTemp.msg);
-        if(GWcounter >= counterLimit){
-          powerDownFlag = true;
-        }
         vTaskDelay( (logTemp.msg*1000-safeWakeTime*2) / portTICK_PERIOD_MS);
       }
   }
@@ -79,11 +76,13 @@ void DatabaseHandler( void *pvParameters) {
         }
         
         xSemaphoreGive(SemaphoreHndl);
-        if(GWcounter < 20){
+        if(GWcounter < counterLimit){
             idleFlag = true;
         }
         else{
             idleFlag = false;
+            //powerDownFlag = true;  // Use this for automatic PowerDown setting after 20 intervals, wake up with external interrupt to only enable Serial queries, not GW 
+            switchGWtoSerMode();     // Use this for not setting PowerDown automatically after 20 intervals, only from Serial manually
         }
       }
       
@@ -102,4 +101,10 @@ void resumeTasks() {
   vTaskResume(gatewayHandle);
   vTaskResume(serialHandle);
   vTaskResume(databaseHandle);
+}
+
+void switchGWtoSerMode(){
+  Serial.println("GW end, Ser start");
+  vTaskSuspend(gatewayHandle);   
+  vTaskSuspend(databaseHandle);
 }
