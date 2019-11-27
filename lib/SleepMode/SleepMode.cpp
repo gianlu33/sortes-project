@@ -178,6 +178,44 @@ void	SleepModeClass::idle(adc_t adc,
 	if (usb == USB_OFF)			power_usb_enable();
 }
 
+void SleepModeClass::disableModules(adc_t adc, timer4_t timer4,
+               timer3_t timer3, timer1_t timer1, timer0_t timer0,
+               spi_t spi, usart1_t usart1, twi_t twi, usb_t usb) {
+     if (adc == ADC_OFF)
+   	{
+   		ADCSRA &= ~(1 << ADEN);
+   		power_adc_disable();
+   	}
+
+   	if (timer4 == TIMER4_OFF)	power_timer4_disable();
+   	if (timer3 == TIMER3_OFF)	power_timer3_disable();
+   	if (timer1 == TIMER1_OFF)	power_timer1_disable();
+   	if (timer0 == TIMER0_OFF)	power_timer0_disable();
+   	if (spi == SPI_OFF)			power_spi_disable();
+   	if (usart1 == USART1_OFF)	power_usart1_disable();
+   	if (twi == TWI_OFF)			power_twi_disable();
+   	if (usb == USB_OFF)			power_usb_disable();
+ }
+
+void SleepModeClass::enableModules(adc_t adc, timer4_t timer4,
+               timer3_t timer3, timer1_t timer1, timer0_t timer0,
+               spi_t spi, usart1_t usart1, twi_t twi, usb_t usb) {
+ if (adc == ADC_OFF)
+ {
+   power_adc_enable();
+   ADCSRA |= (1 << ADEN);
+ }
+
+ if (timer4 == TIMER4_OFF)	power_timer4_enable();
+ if (timer3 == TIMER3_OFF)	power_timer3_enable();
+ if (timer1 == TIMER1_OFF)	power_timer1_enable();
+ if (timer0 == TIMER0_OFF)	power_timer0_enable();
+ if (spi == SPI_OFF)			power_spi_enable();
+ if (usart1 == USART1_OFF)	power_usart1_enable();
+ if (twi == TWI_OFF)			power_twi_enable();
+ if (usb == USB_OFF)			power_usb_enable();
+ }
+
 /*******************************************************************************
 * Name: powerDown
 * Description: Putting microcontroller into power down state. This is

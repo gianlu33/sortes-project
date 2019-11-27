@@ -126,6 +126,14 @@ class SleepModeClass
 				             timer3_t timer3, timer1_t timer1, timer0_t timer0,
 				             spi_t spi, usart1_t usart1, twi_t twi, usb_t usb);
 
+			void disableModules(adc_t adc, timer4_t timer4,
+				             timer3_t timer3, timer1_t timer1, timer0_t timer0,
+				             spi_t spi, usart1_t usart1, twi_t twi, usb_t usb);
+
+		 void enableModules(adc_t adc, timer4_t timer4,
+				             timer3_t timer3, timer1_t timer1, timer0_t timer0,
+				             spi_t spi, usart1_t usart1, twi_t twi, usb_t usb);
+
 			void	powerDown(adc_t adc, bod_t bod) __attribute__((optimize("-O1")));
 
 };
