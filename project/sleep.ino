@@ -70,8 +70,8 @@ void setCounter() {
 ISR (TIMER3_COMPA_vect)
 { 
   if(cnt_left != 0) {     // maybe >= 0?
-    Serial.println("Temp wake");
-    delay(20);
+    //Serial.println("Temp wake");
+    //delay(20);
     setCounter();
 
     // what happens if this routine is triggered when i'm reading from serial port? I can't go to sleep while i'm doing something else
@@ -129,5 +129,7 @@ void enterPowerDownMode() {
 void wakeUp() {
   //TODO verify if there is something to do
   Serial.println("Interrupt triggered");
-  resumeTasks();
+  //resumeTasks();      // Optionally, we can resume all tasks to restart GW comm from the beginning
+  //GWcounter = 0;
+  vTaskResume(serialHandle);
 }
