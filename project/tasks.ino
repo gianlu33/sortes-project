@@ -1,14 +1,23 @@
-/*void vApplicationIdleHook( void ) {
-      // Allow wake up pin to trigger interrupt on low.
-   // attachInterrupt(0, wakeUp, LOW);
-   
-    //TODO going to sleep
-      Serial.println("Sleep");
-      //TODO
+void SleepTask(void *pvParameters) {
+  (void) pvParameters;
     
-    // Disable external pin interrupt on wake up pin.
-    //detachInterrupt(0); 
-}*/
+  while(1) {
+      if(powerDownFlag) {
+        //Serial.println("Power down mode");
+        // go to power down mode
+        //enterPowerDownMode();
+        powerDownFlag = false;
+      }
+      if(idleFlag) {
+        Serial.println("idle mode");
+        // go to idle mode
+        enterIdleMode(sleepDuration);
+        idleFlag = false;
+      }
+
+      vTaskDelay( 20 / portTICK_PERIOD_MS);
+  }
+}
 
 void GatewayComm( void *pvParameters) {
   (void) pvParameters;
@@ -25,17 +34,10 @@ void GatewayComm( void *pvParameters) {
         xQueueSend(logQueue, &logTemp, portMAX_DELAY);
         Serial.println(logTemp.msg);
         if(GWcounter >= 20){
-          deepSleepFlag = 1;
+          powerDownFlag = true;
         }
         vTaskDelay( (logTemp.msg*1000-safeWakeTime*2) / portTICK_PERIOD_MS);
       }
-      // sleep for duration
-
-      
-      
-      //TODO
-      //Serial.println(tempMsg);
-      //vTaskDelay( 100 / portTICK_PERIOD_MS);
   }
 }
 
@@ -59,12 +61,15 @@ void DatabaseHandler( void *pvParameters) {
         if(xSemaphoreTake(SemaphoreHndl, (TickType_t) 5) == pdTRUE){
           addRecord(logTemp);
         }
+        
+        xSemaphoreGive(SemaphoreHndl);
+        idleFlag = true;
       }
-      xSemaphoreGive(SemaphoreHndl);
-      goToSleepFlag = 1;
+      
+      
+     
       
       //TODO
       vTaskDelay( 20 / portTICK_PERIOD_MS);
-
   }
 }

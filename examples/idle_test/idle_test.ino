@@ -1,6 +1,8 @@
 #include <SleepMode.h>
 #include <LoRa.h>
 
+int sleepTime = 0;
+
 void setup() {
   Serial.begin(9600);
   while (!Serial);
@@ -13,10 +15,10 @@ void setup() {
 
 void loop() {
   while(Serial.available() > 0){
-      Serial.parseInt();
+      sleepTime = Serial.parseInt();
       
       digitalWrite(LED_BUILTIN, LOW);
-      setTimer(20);
+      setTimer(sleepTime);
       idleMode();
       digitalWrite(LED_BUILTIN, HIGH);
 

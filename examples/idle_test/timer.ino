@@ -2,7 +2,6 @@
 #define CNT_CLK SYS_CLK / 1024
 
 unsigned long cnt_left = 0;
-bool flagfirst = false;
 
 void setTimer(int seconds){
   cnt_left = CNT_CLK * seconds;
@@ -42,14 +41,9 @@ void setCounter() {
 }
 
 ISR (TIMER3_COMPA_vect)
-{
-  if(flagfirst){
-    flagfirst = false;
-    return;
-  }
-  
+{ 
   //Serial.println("Int");
-  if(cnt_left != 0) {     // maybe >= 0?
+  if(cnt_left != 0) {
     setCounter();
 
     // what happens if this routine is triggered when i'm reading from serial port? I can't go to sleep while i'm doing something else

@@ -8,7 +8,6 @@
 #include <queue.h>
 #include <SleepMode.h>
 
-
 #define TABLE_SIZE 512          // Up to 1024
 
 //LoR32u4II 868MHz or 915MHz (black board)
@@ -18,7 +17,7 @@
   #define SS      8
   #define RST     4
   #define DI0     7
-  #define BAND    869100000  // 915E6
+  #define BAND    869100000
   #define PABOOST true 
 
 const int teamNum = 06;
@@ -27,8 +26,8 @@ int GWcounter = 0;
 
 const int safeWakeTime = 300;
 
-int goToSleepFlag = 0;
-int deepSleepFlag = 0;
+bool idleFlag = false;
+bool powerDownFlag = false;
 
 int sleepDuration = 0;
 
@@ -66,6 +65,7 @@ void setup() {
 
   // Setting up tasks
   if(logQueue != NULL){
+    
     xTaskCreate(
       GatewayComm
       ,  (const portCHAR *)"GatewayComm"   // A name just for humans
@@ -73,7 +73,7 @@ void setup() {
       ,  NULL
       ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
       ,  NULL );
-  
+      
     xTaskCreate(
       DatabaseHandler
       ,  (const portCHAR *)"DatabaseHandler"   // A name just for humans
@@ -89,6 +89,14 @@ void setup() {
     ,  NULL
     ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
     ,  NULL );
+
+    xTaskCreate(
+      SleepTask
+      ,  (const portCHAR *)"SleepTask"   // A name just for humans
+      ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
+      ,  NULL
+      ,  0  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+      ,  NULL );
 
 
  

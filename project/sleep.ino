@@ -1,10 +1,10 @@
 #define WAKE_PIN 3 // select between 0, 1, 2, 3, 7
-#define SYS_CLK 16e6
+#define SYS_CLK 8e6
 #define CNT_CLK SYS_CLK / 1024
 
 bool is_idle = false; // to check if we have to go to sleep again if the interrupt is triggered
 bool idle_finished = true; // to ensure that enterIdleMode() (the one without parameters) does not go to sleep if we have already finished
-unsigned int cnt_left = 0;
+unsigned long cnt_left = 0;
 
 //TODO wake up device if i send a command on the serial interface (maybe it is already working..)
 
@@ -14,37 +14,32 @@ void setup_sleep() {
 
 // IDLE MODE
 
-// TCCR3A
-// 7       6       5      4      3     2      1     0
-//COM3A1 COM3A0 COM3B1 COM3B0 COM3C1 COM3C0 WGM31 WGM30
-// TCCR3B
-// 7    6    5   4      3    2     1    0
-//CNC3 ICES3 – WGM33 WGM32 CS32 CS31 CS30
-
 void enterIdleMode(int seconds) {
   //set the counter
-  cnt_left = CNT_CLK * seconds - (CNT_CLK * safeWakeTime) / 1000;   // I think this might be wrong, as the clock is continuously running
-  
+  cnt_left = CNT_CLK * seconds - (CNT_CLK * safeWakeTime) / 1000;
+
   //set clock source clk / 1024 -> write 101 in CS32..CS30
   //set mode 7 (up to OCR3A)
-  //TODO change only the bits i'm interested in
-  //TODO this can be moved in the "setup" phase
   TCCR3A = 0;
   TCCR3B = 0b00001101;
-
-  //TODO check the order of these instructions
+  
   // clear the counter
   TCNT3 = 0; 
 
   // set the compare register
   setCounter(); 
+
+  // clear pending ints
+  bitSet(TIFR3,OCF3A);
   
   //enable interrupt
   bitSet(TIMSK3, 1);
 
   is_idle = true;
   idle_finished = false;
-  Serial.println("in");
+
+  Serial.println("Entering idle mode");
+  delay(20);
   idleMode();
 }
 
@@ -54,6 +49,8 @@ void enterIdleMode(int seconds) {
 void enterIdleMode() {
   if(!idle_finished) {
     is_idle = true;
+    Serial.println("Entering idle mode");
+    delay(20);
     idleMode();
   }
 }
@@ -72,6 +69,8 @@ void setCounter() {
 ISR (TIMER3_COMPA_vect)
 {
   if(cnt_left != 0) {     // maybe >= 0?
+    Serial.println("Temp wake");
+    delay(20);
     setCounter();
 
     // what happens if this routine is triggered when i'm reading from serial port? I can't go to sleep while i'm doing something else
@@ -85,6 +84,7 @@ ISR (TIMER3_COMPA_vect)
       bitClear(TIMSK3, 1);
       is_idle = false;
       idle_finished = true;
+      Serial.println("Sleep finished");
   }
 }
 
@@ -97,14 +97,11 @@ void idleMode() {
 // POWER DOWN MODE
 
 void enterPowerDownMode() {
-    Serial.println("enteredF");
     attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, CHANGE); // select between CHANGE, LOW, RISING, FALLING
-    
-    Serial.println("Entering low power mode");
+    Serial.println("Entering power down mode");
     delay(20);
     SleepMode.powerDown(ADC_OFF, BOD_OFF);
-    Serial.println("External interrupt received, waking up from low power mode");
-    
+    Serial.println("Wake up from power down mode");
     detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
 }
 

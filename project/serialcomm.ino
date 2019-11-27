@@ -21,11 +21,7 @@ void SerialInstructionHandlerPC(){
             break;
             case 3:
               // Enter ultra low power mode
-              enterPowerDownMode();
-              //enterIdleMode(10);
-              //SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     //SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-              
+              powerDownFlag = true;
             break;
             default:
             break;  
