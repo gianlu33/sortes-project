@@ -5,6 +5,8 @@ int sleepTime = 0;
 int val;
 int cnt =0;
 
+const int WAKE_PIN = 3;
+
 void setup() {
   Serial.begin(9600);
   while (!Serial);
@@ -16,18 +18,21 @@ void setup() {
 }
 
 void loop() {
-  /*
+  
   while(Serial.available() > 0){
       sleepTime = Serial.parseInt();
-      
+      attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, FALLING); // select between CHANGE, LOW, RISING, FALLING
       digitalWrite(LED_BUILTIN, LOW);
+      Serial.println("Going to sleep");
+      delay(20);
       setTimer(sleepTime);
       idleMode();
+      //powerDownMode();
       digitalWrite(LED_BUILTIN, HIGH);
 
   }
-  */
-  val = onReceive(LoRa.parsePacket());
+  
+  /*val = onReceive(LoRa.parsePacket());
   if(val != -1) {
     Serial.println(val);
     delay(20);
@@ -43,5 +48,9 @@ void loop() {
       powerDownMode();
     }
       cnt++;
-  }
+  }*/
+}
+
+void wakeUp(){
+  Serial.println("IR");
 }

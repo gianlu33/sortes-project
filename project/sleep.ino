@@ -9,7 +9,7 @@ unsigned long cnt_left = 0;
 //TODO wake up device if i send a command on the serial interface (maybe it is already working..)
 
 void setup_sleep() {
-  pinMode(WAKE_PIN, INPUT_PULLUP);
+  //pinMode(WAKE_PIN, INPUT_PULLUP);
 }
 
 // IDLE MODE
@@ -119,12 +119,15 @@ void disableIdleMode() {
 // POWER DOWN MODE
 
 void enterPowerDownMode() {
-    attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, LOW); // select between CHANGE, LOW, RISING, FALLING
+    attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, FALLING); // select between CHANGE, LOW, RISING, FALLING
     Serial.println("Entering power down mode");
     delay(20);
     stopTasks();
     SleepMode.powerDown(ADC_OFF, BOD_OFF);
     Serial.println("Wake up from power down mode");
+    //detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
+    vTaskResume(serialHandle);
+    //vTaskResume(databaseHandle);
     detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
 }
 
@@ -133,5 +136,5 @@ void wakeUp() {
   Serial.println("Interrupt triggered");
   //resumeTasks();      // Optionally, we can resume all tasks to restart GW comm from the beginning
   //GWcounter = 0;
-  vTaskResume(serialHandle);
+
 }
