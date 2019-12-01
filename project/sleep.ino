@@ -119,7 +119,7 @@ void disableIdleMode() {
 // POWER DOWN MODE
 
 void enterPowerDownMode() {
-    attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, FALLING); // select between CHANGE, LOW, RISING, FALLING
+    attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, LOW); // select between CHANGE, LOW, RISING, FALLING
     Serial.println("Entering power down mode");
     delay(20);
     stopTasks();

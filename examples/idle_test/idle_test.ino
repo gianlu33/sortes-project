@@ -5,7 +5,7 @@ int sleepTime = 0;
 int val;
 int cnt =0;
 
-const int WAKE_PIN = 3;
+const int WAKE_PIN = 2;
 
 void setup() {
   Serial.begin(9600);
@@ -15,19 +15,23 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
+  pinMode(WAKE_PIN, INPUT);
 }
 
 void loop() {
   
   while(Serial.available() > 0){
       sleepTime = Serial.parseInt();
-      attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, FALLING); // select between CHANGE, LOW, RISING, FALLING
       digitalWrite(LED_BUILTIN, LOW);
       Serial.println("Going to sleep");
       delay(20);
+      attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, LOW);
       setTimer(sleepTime);
-      idleMode();
-      //powerDownMode();
+      //idleMode();
+      powerDownMode();
+      delay(20);
+      Serial.println("Woke");
+      delay(20);
       digitalWrite(LED_BUILTIN, HIGH);
 
   }
@@ -53,4 +57,5 @@ void loop() {
 
 void wakeUp(){
   Serial.println("IR");
+  detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
 }
