@@ -136,6 +136,8 @@ class SleepModeClass
 
 			void	powerDown(adc_t adc, bod_t bod) __attribute__((optimize("-O1")));
 
+			void enterIdleSleep();
+
 };
 
 extern SleepModeClass SleepMode;

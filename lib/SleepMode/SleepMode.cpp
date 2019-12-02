@@ -256,4 +256,8 @@ void	SleepModeClass::powerDown(adc_t adc, bod_t bod)
 	if (adc == ADC_OFF) ADCSRA |= (1 << ADEN);
 }
 
+void SleepModeClass::enterIdleSleep(){
+        lowPowerBodOn(SLEEP_MODE_IDLE);
+}
+
 SleepModeClass SleepMode;
