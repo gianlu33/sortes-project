@@ -4,6 +4,20 @@
 
 #define RESTART_GW 0
 
+// Timer 4 PRR bit is currently not defined in iom32u4.h
+#ifndef PRTIM4
+  #define PRTIM4 4
+#endif
+
+// Timer 4 power reduction macro is not defined currently in power.h
+#ifndef power_timer4_disable
+  #define power_timer4_disable()  (PRR1 |= (uint8_t)(1 << PRTIM4))
+#endif
+
+#ifndef power_timer4_enable
+  #define power_timer4_enable()   (PRR1 &= (uint8_t)~(1 << PRTIM4))
+#endif
+
 unsigned long cnt_left = 0;
 
 void setup_sleep() {
@@ -70,24 +84,12 @@ void idleMode() {
 
   disableModules();
   while(idleFlag){
-    SleepMode.enterIdleSleep();
-  }
+    sleep_idle();
+  }    
   enableModules();
-  resumeTasks();
-                    
+
   Serial.println("wake up");
-}
-
-void disableModules() {
-    SleepMode.disableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-                     // USB_ON to turn on Serial during GW operation!
-}
-
-void enableModules() {
-    SleepMode.enableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-                     // USB_ON to turn on Serial during GW operation!
+  resumeTasks();      
 }
 
 // POWER DOWN MODE
@@ -101,7 +103,8 @@ void enterPowerDownMode() {
     disableUSB();
     
     while(powerDownFlag) {
-      SleepMode.powerDown(ADC_OFF, BOD_OFF);
+      //SleepMode.powerDown(ADC_OFF, BOD_OFF);
+      sleep_powerdown();
     }
 
     enableUSB();
@@ -133,4 +136,56 @@ void enableUSB() {
   USBDevice.attach(); // keep this
   Serial.begin(9600);
   while(!Serial);
+}
+
+void enableModules() {
+  power_adc_enable();
+  ADCSRA |= (1 << ADEN);
+
+  power_timer4_enable();
+  //power_timer3_enable();
+  power_timer1_enable();
+  power_timer0_enable();
+  power_spi_enable();
+  power_usart1_enable();
+  power_twi_enable();
+  power_usb_enable();
+}
+
+void disableModules() {
+  ADCSRA &= ~(1 << ADEN);
+  power_adc_disable();
+
+  power_timer4_disable();
+  //power_timer3_disable();
+  power_timer1_disable();
+  power_timer0_disable();
+  power_spi_disable();
+  power_usart1_disable();
+  power_twi_disable();
+  power_usb_disable(); 
+}
+
+void sleep_idle() {
+  goToSleep(SLEEP_MODE_IDLE);
+}
+
+void goToSleep(int mode) {
+  do {
+  set_sleep_mode(mode);
+  cli();
+  sleep_enable();
+  sei();
+  sleep_cpu();
+  sleep_disable();
+  sei();
+} while (0);
+}
+
+void sleep_powerdown() {
+  ADCSRA &= ~(1 << ADEN);
+  
+  goToSleep(SLEEP_MODE_PWR_DOWN);
+
+  ADCSRA |= (1 << ADEN);
 }

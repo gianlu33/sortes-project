@@ -7,10 +7,14 @@
 #include <semphr.h>
 #include <queue.h>
 #include <SleepMode.h>
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <avr/power.h>
+#include <avr/interrupt.h>
 
 #define TABLE_SIZE 512          // Up to 1024
 
-#define portUSE_WDTO WDTO_30MS
+//#define portUSE_WDTO WDTO_30MS
 
 const int safeWakeTime = 300;
 
@@ -26,7 +30,7 @@ const int safeWakeTime = 300;
 
 const int teamNum = 06;
 
-const int counterLimit = 20;
+const int counterLimit = 4;
 
 int GWcounter = 0;
 
