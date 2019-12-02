@@ -2,7 +2,7 @@ void vApplicationIdleHook(void) {
       if(powerDownFlag) {
         // go to power down mode
         enterPowerDownMode();
-        powerDownFlag = false;
+        powerDownFlag = false;   // Maybe this should only be set to false when we want to wake up? Probably yes
         idleFlag = false;
       }
       else if(idleFlag) {

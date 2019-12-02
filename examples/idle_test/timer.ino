@@ -57,10 +57,32 @@ ISR (TIMER3_COMPA_vect)
 }
 
 void idleMode() {
-  SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+  //SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
+  //                   SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
 }
 
 void powerDownMode() {
   SleepMode.powerDown(ADC_OFF, BOD_OFF);
+}
+
+void enterPowerDown(){
+  attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, FALLING);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  //portENTER_CRITICAL();
+  sleep_enable();
+  //#if defined(BODS) && defined(BODSE)
+  //sleep_bod_disable();
+  //#endif
+  //portEXIT_CRITICAL();
+  //USBCON |= _BV(FRZCLK);
+  //PLLCSR &= ~_BV(PLLE);
+  //USBCON &= ~_BV(USBE);
+  
+  sleep_cpu();
+  sleep_disable();
+  //delay(100);
+  //USBDevice.attach();
+  //delay(100);
+  //Serial.begin(9600);
+  detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
 }

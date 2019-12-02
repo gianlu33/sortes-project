@@ -138,3 +138,16 @@ void wakeUp() {
   //GWcounter = 0;
 
 }
+/*
+void enterPowerDown(){
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  portENTER_CRITICAL();
+  sleep_enable();
+  #if defined(BODS) && defined(BODSE)
+  sleep_bod_disable();
+  #endif
+  portEXIT_CRITICAL();
+  sleep_cpu();
+  sleep_reset();
+}
+*/
