@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <semphr.h>
 #include <queue.h>
-#include <SleepMode.h>
 
 #define TABLE_SIZE 512          // Up to 1024
 
@@ -23,6 +22,8 @@ const int safeWakeTime = 300;
   #define DI0     7
   #define BAND    869100000
   #define PABOOST true 
+
+#define RESTART_GW 0
 
 const int teamNum = 06;
 
