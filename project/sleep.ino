@@ -2,14 +2,12 @@
 #define SYS_CLK 8e6
 #define CNT_CLK SYS_CLK / 1024
 
-bool is_idle = false; // to check if we have to go to sleep again if the interrupt is triggered
-bool idle_finished = true; // to ensure that enterIdleMode() (the one without parameters) does not go to sleep if we have already finished
+#define RESTART_GW 0
+
 unsigned long cnt_left = 0;
 
-//TODO wake up device if i send a command on the serial interface (maybe it is already working..)
-
 void setup_sleep() {
-  //pinMode(WAKE_PIN, INPUT_PULLUP);
+  pinMode(WAKE_PIN, INPUT_PULLUP);
 }
 
 // IDLE MODE
@@ -34,26 +32,11 @@ void enterIdleMode(int seconds) {
   
   //enable interrupt
   bitSet(TIMSK3, 1);
-
-  is_idle = true;
-  idle_finished = false;
   
   Serial.println("Entering idle mode");
   delay(20);
   
   idleMode();
-}
-
-// Call this one if you were already sleeping, but it arrives a serial communication and you serve it, then you want to go to sleep again
-// Note that the timer is already set, we don't have to do anything except for going to sleep
-// If in the meanwhile the counter has reached 0, we don't have to sleep
-void enterIdleMode() {
-  if(!idle_finished) {
-    is_idle = true;
-    Serial.println("Entering idle mode");
-    delay(20);
-    idleMode();
-  }
 }
 
 void setCounter() {
@@ -69,27 +52,15 @@ void setCounter() {
 
 ISR (TIMER3_COMPA_vect)
 { 
-  if(cnt_left != 0) {     // maybe >= 0?
+  if(cnt_left != 0) {
     //Serial.println("Temp wake");
     //delay(20);
     setCounter();
-
-    // what happens if this routine is triggered when i'm reading from serial port? I can't go to sleep while i'm doing something else
-    // When this occurs, idle must be set to false manually, do all the operations and then call enterIdleMode()
-    //if(is_idle) {
-      //idleMode();
-    //}
   }
   else {
     // disable interrupt
       bitClear(TIMSK3, 1);
-      disableIdleMode();
-      resumeTasks();
-      is_idle = false;
       idleFlag = false;
-      idle_finished = true;
-      Serial.println("Sleep finished");
-      delay(20);
   }
 }
 
@@ -97,30 +68,23 @@ void idleMode() {
    // stopping tasks
   stopTasks();
 
-  //portSUPPRESS_TICKS_AND_SLEEP(cnt_left * 1024);
-  enableIdleMode();
+  disableModules();
   while(idleFlag){
     SleepMode.enterIdleSleep();
-    //SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-    //                 SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-                     //Serial.println("a");
-                     //delay(5);
   }
-  //vTaskDelay( 20 / portTICK_PERIOD_MS);
-  //disableIdleMode();
-  //resumeTasks();
+  enableModules();
+  resumeTasks();
                     
-  //Serial.println("wake up");
+  Serial.println("wake up");
 }
 
-// FAKE IDLE MODE
-void enableIdleMode() {
+void disableModules() {
     SleepMode.disableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
                      SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
                      // USB_ON to turn on Serial during GW operation!
 }
 
-void disableIdleMode() {
+void enableModules() {
     SleepMode.enableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
                      SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
                      // USB_ON to turn on Serial during GW operation!
@@ -132,32 +96,41 @@ void enterPowerDownMode() {
     attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, LOW); // select between CHANGE, LOW, RISING, FALLING
     Serial.println("Entering power down mode");
     delay(20);
+    
     stopTasks();
-    SleepMode.powerDown(ADC_OFF, BOD_OFF);
+    disableUSB();
+    
+    while(powerDownFlag) {
+      SleepMode.powerDown(ADC_OFF, BOD_OFF);
+    }
+
+    enableUSB();
     Serial.println("Wake up from power down mode");
-    //detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
+
+#if RESTART_GW
+    resumeTasks();      // Optionally, we can resume all tasks to restart GW comm from the beginning
+    GWcounter = 0;
+#else
     vTaskResume(serialHandle);
-    //vTaskResume(databaseHandle);
+#endif
+    
     detachInterrupt(digitalPinToInterrupt(WAKE_PIN));
 }
 
 void wakeUp() {
-  //TODO verify if there is something to do
-  Serial.println("Interrupt triggered");
-  //resumeTasks();      // Optionally, we can resume all tasks to restart GW comm from the beginning
-  //GWcounter = 0;
+  powerDownFlag = false;
+  idleFlag = false;
+}
 
+void disableUSB() {
+  // disable the USB prior going to sleep
+  USBCON |= _BV(FRZCLK);  //freeze USB clock
+  PLLCSR &= ~_BV(PLLE);   // turn off USB PLL
+  USBCON &= ~_BV(USBE);   // disable USB
 }
-/*
-void enterPowerDown(){
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  portENTER_CRITICAL();
-  sleep_enable();
-  #if defined(BODS) && defined(BODSE)
-  sleep_bod_disable();
-  #endif
-  portEXIT_CRITICAL();
-  sleep_cpu();
-  sleep_reset();
+
+void enableUSB() {
+  USBDevice.attach(); // keep this
+  Serial.begin(9600);
+  while(!Serial);
 }
-*/

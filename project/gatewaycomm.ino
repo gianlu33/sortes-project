@@ -1,5 +1,3 @@
-//TODO functions
-
 struct Log onReceive(int packetSize) {
   Log logTemp;
   logTemp.msg = 0;

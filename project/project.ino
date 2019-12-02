@@ -10,7 +10,9 @@
 
 #define TABLE_SIZE 512          // Up to 1024
 
-//#define portUSE_WDTO WDTO_15MS
+#define portUSE_WDTO WDTO_30MS
+
+const int safeWakeTime = 300;
 
 //LoR32u4II 868MHz or 915MHz (black board)
   #define SCK     15
@@ -24,11 +26,9 @@
 
 const int teamNum = 06;
 
-const int counterLimit = 4;
+const int counterLimit = 20;
 
 int GWcounter = 0;
-
-const int safeWakeTime = 300;
 
 bool idleFlag = false;
 bool powerDownFlag = false;
@@ -61,8 +61,6 @@ void setup() {
   db.create(0, TABLE_SIZE, (unsigned int)sizeof(logType));
   //db.open(0);       // Uncomment for using an already stored EEPROM database, comment out db.create() in this case!
 
-  //TODO set parameters...
-
   SemaphoreHndl = xSemaphoreCreateBinary();
   if( (SemaphoreHndl) != NULL)
     xSemaphoreGive((SemaphoreHndl));
@@ -94,18 +92,7 @@ void setup() {
     ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
     ,  NULL
     ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  &serialHandle );
-
-  /*  xTaskCreate(
-      SleepTask
-      ,  (const portCHAR *)"SleepTask"   // A name just for humans
-      ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
-      ,  NULL
-      ,  0  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-      ,  &sleepHandle );*/
-
-
- 
+    ,  &serialHandle ); 
 }
 
 void loop() {

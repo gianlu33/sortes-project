@@ -1,14 +1,13 @@
+#define N_TICKS 2
+
 void vApplicationIdleHook(void) {
       if(powerDownFlag) {
         // go to power down mode
         enterPowerDownMode();
-        powerDownFlag = false;   // Maybe this should only be set to false when we want to wake up? Probably yes
-        idleFlag = false;
       }
       else if(idleFlag) {
         // go to idle mode
         enterIdleMode(sleepDuration);
-        idleFlag = false;
       }
 }
 
@@ -35,17 +34,15 @@ void SerialCommPC( void *pvParameters) {
   (void) pvParameters;  
     while(1) {
       SerialInstructionHandlerPC();
-      vTaskDelay( 65 / portTICK_PERIOD_MS);
+      vTaskDelay(N_TICKS);
+      //vTaskDelay( 65 / portTICK_PERIOD_MS);
   }
 }
 
 void DatabaseHandler( void *pvParameters) {
   (void) pvParameters;
 
-    while(1) {
-      //Serial.println("Hello DatabaseHandler");
-      
-      
+    while(1) {    
       Log logTemp;
       if(xQueueReceive(logQueue, &logTemp, portMAX_DELAY) == pdPASS){
         if(xSemaphoreTake(SemaphoreHndl, (TickType_t) 5) == pdTRUE){
@@ -58,13 +55,13 @@ void DatabaseHandler( void *pvParameters) {
         }
         else{
             idleFlag = false;
-            //powerDownFlag = true;  // Use this for automatic PowerDown setting after 20 intervals, wake up with external interrupt to only enable Serial queries, not GW 
-            switchGWtoSerMode();     // Use this for not setting PowerDown automatically after 20 intervals, only from Serial manually
+            powerDownFlag = true;  // Use this for automatic PowerDown setting after 20 intervals, wake up with external interrupt to only enable Serial queries, not GW 
+            //switchGWtoSerMode();     // Use this for not setting PowerDown automatically after 20 intervals, only from Serial manually
         }
       }
       
-      //TODO
-      vTaskDelay( 65 / portTICK_PERIOD_MS);
+      vTaskDelay(N_TICKS);
+      //vTaskDelay( 65 / portTICK_PERIOD_MS);
   }
 }
 
