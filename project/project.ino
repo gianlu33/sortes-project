@@ -10,6 +10,8 @@
 
 #define TABLE_SIZE 512          // Up to 1024
 
+//#define portUSE_WDTO WDTO_15MS
+
 //LoR32u4II 868MHz or 915MHz (black board)
   #define SCK     15
   #define MISO    14

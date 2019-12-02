@@ -35,7 +35,7 @@ void SerialCommPC( void *pvParameters) {
   (void) pvParameters;  
     while(1) {
       SerialInstructionHandlerPC();
-      vTaskDelay( 20 / portTICK_PERIOD_MS);
+      vTaskDelay( 65 / portTICK_PERIOD_MS);
   }
 }
 
@@ -64,7 +64,7 @@ void DatabaseHandler( void *pvParameters) {
       }
       
       //TODO
-      vTaskDelay( 20 / portTICK_PERIOD_MS);
+      vTaskDelay( 65 / portTICK_PERIOD_MS);
   }
 }
 

@@ -86,8 +86,10 @@ ISR (TIMER3_COMPA_vect)
       disableIdleMode();
       resumeTasks();
       is_idle = false;
+      idleFlag = false;
       idle_finished = true;
       Serial.println("Sleep finished");
+      delay(20);
   }
 }
 
@@ -96,9 +98,17 @@ void idleMode() {
   stopTasks();
 
   //portSUPPRESS_TICKS_AND_SLEEP(cnt_left * 1024);
-  //SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-    //                 SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
   enableIdleMode();
+  while(idleFlag){
+    SleepMode.enterIdleSleep();
+    //SleepMode.idle(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
+    //                 SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+                     //Serial.println("a");
+                     //delay(5);
+  }
+  //vTaskDelay( 20 / portTICK_PERIOD_MS);
+  //disableIdleMode();
+  //resumeTasks();
                     
   //Serial.println("wake up");
 }
