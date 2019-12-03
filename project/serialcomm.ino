@@ -22,7 +22,7 @@ void SerialInstructionHandlerPC(){
               }
             break;
             case 3:
-              // Enter ultra low power mode
+              // Enter ultra low Power Down mode
               powerDownFlag = true;
             break;
             default:

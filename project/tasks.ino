@@ -1,5 +1,3 @@
-//#define N_TICKS 2
-
 void vApplicationIdleHook(void) {
   // Idle task function, runs when no other tasks are executing
   // Used for going to sleep whenever the flags signal that we should be sleeping
@@ -36,7 +34,7 @@ void SerialCommPC( void *pvParameters) {
   (void) pvParameters;  
     while(1) {
       SerialInstructionHandlerPC();   // Call the instruction handler function
-      vTaskDelay( 20 / portTICK_PERIOD_MS);   // Delay the task so the others can run
+      vTaskDelay( 20 / portTICK_PERIOD_MS);   // Slightly delay the task so the others can run
   }
 }
 
@@ -62,23 +60,19 @@ void DatabaseHandler( void *pvParameters) {
             //switchGWtoSerMode();     // Use this for not setting PowerDown automatically after 20 intervals, only from Serial manually
         }
       }
-      
-      //vTaskDelay(N_TICKS);
-      vTaskDelay( 20 / portTICK_PERIOD_MS);
+      vTaskDelay( 20 / portTICK_PERIOD_MS); // Slightly delay the task so the others can run
   }
 }
 
 void stopTasks() {
   // Function for suspending all tasks
   vTaskSuspend(gatewayHandle);
-  //vTaskSuspend(serialHandle);
   vTaskSuspend(databaseHandle);
 }
 
 void resumeTasks() {
   // Function for resuming all tasks
   vTaskResume(gatewayHandle);
-  //vTaskResume(serialHandle);
   vTaskResume(databaseHandle);
 }
 

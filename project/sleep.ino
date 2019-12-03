@@ -54,7 +54,7 @@ ISR (TIMER3_COMPA_vect){
     enableModules();
     resumeTasks();
     idleFlag = false;
-    //Serial.println("Waking up");
+    //Serial.println("Sleep finished");
     //delay(20);
   }
 }
@@ -85,18 +85,19 @@ void enableModules() {
 // POWER DOWN MODE
 
 void enterPowerDownMode() {
+    // Enter ultra low Power Down mode
     attachInterrupt(digitalPinToInterrupt(WAKE_PIN), wakeUp, LOW); // Attach interrupt to WAKE_PIN
     Serial.println("Entering power down mode");   // print for visual confirmation
     delay(20);
     
     stopTasks();
-    disableUSB();
+    disableUSB();     // Disable USB to enable turning it back on for the serial communication with the PC
     
     while(powerDownFlag) {
       SleepMode.enterPowerDown(ADC_OFF, BOD_OFF);
     }
 
-    enableUSB();
+    enableUSB();      // Enable USB serial communication with the PC
     Serial.println("Wake up from power down mode");
 
 #if RESTART_GW
