@@ -10,7 +10,7 @@
 
 #define TABLE_SIZE 512          // Up to 1024, corresponds to EEPROM capacity
 
-//#define portUSE_WDTO WDTO_30MS    // Watchdog timer tick time can be increased to reduce power consumption even more (slightly), at the cost of real-time responsiveness. Default: 15MS
+//#define portUSE_WDTO WDTO_15MS    // Watchdog timer tick time can be increased to reduce power consumption even more (slightly), at the cost of real-time responsiveness. For this, the task tick delay calls also have to be adjusted. Default: 15MS
 
 //LoR32u4II 868MHz or 915MHz (black board)
   #define SCK     15

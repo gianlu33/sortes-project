@@ -60,7 +60,7 @@ void DatabaseHandler( void *pvParameters) {
             //switchGWtoSerMode();     // Use this for not setting PowerDown automatically after 20 intervals, only from Serial manually
         }
       }
-      vTaskDelay( 20 / portTICK_PERIOD_MS); // Slightly delay the task so the others can run
+      vTaskDelay( 20 / portTICK_PERIOD_MS); // Slightly delay the task so the others can run: 30>20>15, so this corresponds to a delay of 1 tick
   }
 }
 
