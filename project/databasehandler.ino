@@ -79,8 +79,6 @@ float getTemp()
 {
   // The internal temperature has to be used
   // with the internal reference of 1.1V.
-  // Channel 8 can not be selected with
-  // the analogRead function yet.
 
   // Set the internal reference and mux.
   ADMUX = (_BV(REFS1) | _BV(REFS0) | _BV(MUX3));
