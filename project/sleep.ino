@@ -74,14 +74,13 @@ void disableModules() {
     // Function for disabling modules
     SleepMode.disableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
                      SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-                     // Set USB_ON to turn on Serial during GW operation!
+                     // Set USB_ON to keep Serial comm with PC turned on during GW operation!
 }
 
 void enableModules() {
     // Function for enabling modules
-    SleepMode.enableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
-                     SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-                     // Set USB_ON to turn on Serial during GW operation!
+    SleepMode.enableModules(ADC_ON, TIMER4_ON, TIMER3_ON, TIMER1_ON, TIMER0_ON,
+                     SPI_ON, USART1_ON, TWI_ON, USB_ON);
 }
 
 // POWER DOWN MODE
@@ -95,7 +94,7 @@ void enterPowerDownMode() {
     disableUSB();
     
     while(powerDownFlag) {
-      SleepMode.powerDown(ADC_OFF, BOD_OFF);
+      SleepMode.enterPowerDown(ADC_OFF, BOD_OFF);
     }
 
     enableUSB();

@@ -7,29 +7,6 @@
 
 #define DISABLE_BOD 0
 
-/* TODO
-
-1- verify if we can change BOD settings through software
-  LowPower library says our device can't, infact if we enable DISABLE_BOD we get
-  compilation errors
-
-2- Modify the modes in the following way:
-  A. The watchdog timer CANNOT be used -> it is used by the FreeRTOS library
-     Verify if we can disable it safely during sleep mode (power down)
-
-  B. For idle mode, maybe set here the timer which will wake up the device
-
-  C. For power down mode, maybe set here which pin we can use to trigger an interrupt
-     in order to wake up the device
-
-  D. See if we can disable other components in order to save power:
-      - BOD
-      - Internal Voltage Reference
-      - Watchdog timer
-      - Port pins
-      - On-Chip debug system
-
-*/
 
 // Only Pico Power devices can change BOD settings through software
 #if DISABLE_BOD
@@ -140,43 +117,6 @@ Some definitions for our device
 *				(a) USB_OFF - Turn off USB module
 *				(b) USB_ON - Leave USB module in its default state
 *******************************************************************************/
-void	SleepModeClass::idle(adc_t adc,
-							timer4_t timer4, timer3_t timer3,
-							timer1_t timer1, timer0_t timer0,
-							spi_t spi, usart1_t usart1,	twi_t twi, usb_t usb)
-{
-	if (adc == ADC_OFF)
-	{
-		ADCSRA &= ~(1 << ADEN);
-		power_adc_disable();
-	}
-
-	if (timer4 == TIMER4_OFF)	power_timer4_disable();
-	if (timer3 == TIMER3_OFF)	power_timer3_disable();
-	if (timer1 == TIMER1_OFF)	power_timer1_disable();
-	if (timer0 == TIMER0_OFF)	power_timer0_disable();
-	if (spi == SPI_OFF)			power_spi_disable();
-	if (usart1 == USART1_OFF)	power_usart1_disable();
-	if (twi == TWI_OFF)			power_twi_disable();
-	if (usb == USB_OFF)			power_usb_disable();
-
-	lowPowerBodOn(SLEEP_MODE_IDLE);
-
-	if (adc == ADC_OFF)
-	{
-		power_adc_enable();
-		ADCSRA |= (1 << ADEN);
-	}
-
-	if (timer4 == TIMER4_OFF)	power_timer4_enable();
-	if (timer3 == TIMER3_OFF)	power_timer3_enable();
-	if (timer1 == TIMER1_OFF)	power_timer1_enable();
-	if (timer0 == TIMER0_OFF)	power_timer0_enable();
-	if (spi == SPI_OFF)			power_spi_enable();
-	if (usart1 == USART1_OFF)	power_usart1_enable();
-	if (twi == TWI_OFF)			power_twi_enable();
-	if (usb == USB_OFF)			power_usb_enable();
-}
 
 void SleepModeClass::disableModules(adc_t adc, timer4_t timer4,
                timer3_t timer3, timer1_t timer1, timer0_t timer0,
@@ -206,14 +146,14 @@ void SleepModeClass::enableModules(adc_t adc, timer4_t timer4,
    ADCSRA |= (1 << ADEN);
  }
 
- if (timer4 == TIMER4_OFF)	power_timer4_enable();
- if (timer3 == TIMER3_OFF)	power_timer3_enable();
- if (timer1 == TIMER1_OFF)	power_timer1_enable();
- if (timer0 == TIMER0_OFF)	power_timer0_enable();
- if (spi == SPI_OFF)			power_spi_enable();
- if (usart1 == USART1_OFF)	power_usart1_enable();
- if (twi == TWI_OFF)			power_twi_enable();
- if (usb == USB_OFF)			power_usb_enable();
+ if (timer4 == TIMER4_ON)	power_timer4_enable();
+ if (timer3 == TIMER3_ON)	power_timer3_enable();
+ if (timer1 == TIMER1_ON)	power_timer1_enable();
+ if (timer0 == TIMER0_ON)	power_timer0_enable();
+ if (spi == SPI_ON)			power_spi_enable();
+ if (usart1 == USART1_ON)	power_usart1_enable();
+ if (twi == TWI_ON)			power_twi_enable();
+ if (usb == USB_ON)			power_usb_enable();
  }
 
 /*******************************************************************************
@@ -236,8 +176,9 @@ void SleepModeClass::enableModules(adc_t adc, timer4_t timer4,
 *				(b) BOD_ON - Leave BOD module in its default state
 *
 *******************************************************************************/
-void	SleepModeClass::powerDown(adc_t adc, bod_t bod)
+void	SleepModeClass::enterPowerDown(adc_t adc, bod_t bod)
 {
+    // Enter ultra low Power Down mode
 	if (adc == ADC_OFF)	ADCSRA &= ~(1 << ADEN);
 
 	if (bod == BOD_OFF)
@@ -256,8 +197,10 @@ void	SleepModeClass::powerDown(adc_t adc, bod_t bod)
 	if (adc == ADC_OFF) ADCSRA |= (1 << ADEN);
 }
 
-void SleepModeClass::enterIdleSleep(){
-        lowPowerBodOn(SLEEP_MODE_IDLE);
+void SleepModeClass::enterIdleSleep()
+{
+    // Enter Idle Sleep mode
+    lowPowerBodOn(SLEEP_MODE_IDLE);
 }
 
 SleepModeClass SleepMode;
