@@ -32,7 +32,7 @@
 
 unsigned long cnt_left = 0;   // Counter for the idle mode timer (Timer3)
 
-// const String teamHeader = "GW06";
+const char *teamHeader = "GW06";
 
 const int counterLimit = 20;    // Number of intervals before deep sleep
 const int safeWakeTime = 300;   // Wake guard for idle mode (ms)

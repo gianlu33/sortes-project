@@ -74,7 +74,6 @@ void disableModules() {
     // Function for disabling modules
     SleepMode.disableModules(ADC_OFF, TIMER4_OFF, TIMER3_ON, TIMER1_OFF, TIMER0_OFF,
                      SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-                     // Set USB_ON to keep Serial comm with PC turned on during GW operation!
 }
 
 void enableModules() {
