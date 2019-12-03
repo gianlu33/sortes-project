@@ -106,7 +106,7 @@ void setup() {
     ,  &serialHandle ); 
 
   delay(20);
-  vTaskSuspend(serialHandle);
+  vTaskSuspend(serialHandle);   // Suspend the Serial comm PC task: it will only be enabled after we are finished with the GW comm
 }
 
 void loop() {
