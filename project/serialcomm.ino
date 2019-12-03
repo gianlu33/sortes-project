@@ -16,7 +16,6 @@ void SerialInstructionHandlerPC(){
             break;
             case 2:
               // Read all records from the EEPROM database
-              // Command is only valid if GW communication is finished, as printing everything takes a long time and would interrupt the synchronized real-time GW communication
               if(xSemaphoreTake(SemaphoreHndl, (TickType_t) 5) == pdTRUE){
                 readAllRec();
                 xSemaphoreGive(SemaphoreHndl);

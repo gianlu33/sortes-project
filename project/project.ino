@@ -104,6 +104,9 @@ void setup() {
     ,  NULL
     ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
     ,  &serialHandle ); 
+
+  delay(20);
+  vTaskSuspend(serialHandle);
 }
 
 void loop() {

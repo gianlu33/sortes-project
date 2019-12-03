@@ -71,20 +71,20 @@ void DatabaseHandler( void *pvParameters) {
 void stopTasks() {
   // Function for suspending all tasks
   vTaskSuspend(gatewayHandle);
-  vTaskSuspend(serialHandle);
+  //vTaskSuspend(serialHandle);
   vTaskSuspend(databaseHandle);
 }
 
 void resumeTasks() {
   // Function for resuming all tasks
   vTaskResume(gatewayHandle);
-  vTaskResume(serialHandle);
+  //vTaskResume(serialHandle);
   vTaskResume(databaseHandle);
 }
 
 void switchGWtoSerMode(){
   // Function to call after 20 intervals, if we don't want to automatically enter Power Down mode. Keeps the serial handler task open.
   Serial.println("GW end, Ser start");
-  vTaskSuspend(gatewayHandle);   
-  vTaskSuspend(databaseHandle);
+  stopTasks();
+  vTaskResume(serialHandle);
 }

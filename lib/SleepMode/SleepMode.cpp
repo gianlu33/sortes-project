@@ -140,7 +140,7 @@ void SleepModeClass::disableModules(adc_t adc, timer4_t timer4,
 void SleepModeClass::enableModules(adc_t adc, timer4_t timer4,
                timer3_t timer3, timer1_t timer1, timer0_t timer0,
                spi_t spi, usart1_t usart1, twi_t twi, usb_t usb) {
- if (adc == ADC_OFF)
+ if (adc == ADC_ON)
  {
    power_adc_enable();
    ADCSRA |= (1 << ADEN);
