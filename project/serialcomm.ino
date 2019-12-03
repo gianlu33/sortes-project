@@ -4,8 +4,7 @@ void SerialInstructionHandlerPC(){
   // Function for handling serial communication with the PC (user inputs through the serial monitor)
   int inputMsg = 0;
       while(Serial.available() > 0){
-        //Serial.println("Enter command (1 - read last record, 2 - read all records, 3 - enter ultra low power mode):");
-        //Serial.println("runs");
+        // Available commands: 1 - read last record, 2 - read all records, 3 - enter ultra low power mode
         inputMsg = Serial.parseInt();
           switch (inputMsg){
             case 1:
@@ -17,6 +16,7 @@ void SerialInstructionHandlerPC(){
             break;
             case 2:
               // Read all records from the EEPROM database
+              // Command is only valid if GW communication is finished, as printing everything takes a long time and would interrupt the synchronized real-time GW communication
               if(xSemaphoreTake(SemaphoreHndl, (TickType_t) 5) == pdTRUE){
                 readAllRec();
                 xSemaphoreGive(SemaphoreHndl);
