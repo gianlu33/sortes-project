@@ -33,8 +33,8 @@ void enterIdleMode(int seconds) {
   //enable interrupt
   bitSet(TIMSK3, 1);
   
-  Serial.println("Entering idle mode");
-  delay(20);
+  //Serial.println("Sleeping");
+  //delay(20);
   
   idleMode();
 }
@@ -60,7 +60,10 @@ ISR (TIMER3_COMPA_vect)
   else {
     // disable interrupt
       bitClear(TIMSK3, 1);
+      enableModules();
+      resumeTasks();
       idleFlag = false;
+      //Serial.println("Waking up");
   }
 }
 
@@ -72,10 +75,9 @@ void idleMode() {
   while(idleFlag){
     SleepMode.enterIdleSleep();
   }
-  enableModules();
-  resumeTasks();
+  
                     
-  Serial.println("wake up");
+  //Serial.println("wake up");
 }
 
 void disableModules() {

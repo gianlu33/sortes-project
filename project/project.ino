@@ -10,7 +10,7 @@
 
 #define TABLE_SIZE 512          // Up to 1024
 
-#define portUSE_WDTO WDTO_30MS
+//#define portUSE_WDTO WDTO_30MS
 
 const int safeWakeTime = 300;
 
